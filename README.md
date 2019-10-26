@@ -15,10 +15,10 @@ also is intended as an upgrade of my former timer and timing functions of my HIV
 ## Content and Usage
 ### Documentation
 Automatic documentation was generated using [doxygen](http://www.doxygen.nl/index.html). 
-A pdf version is present in the documentation folder.
+A pdf version is present in the [documentation folder](/docs/).
 
 ### Source
-The Fortran 2003 source can be found in the folder [src]()
+The Fortran 2003 source can be found in the folder [src](/src/)
 
 ### Example
 
