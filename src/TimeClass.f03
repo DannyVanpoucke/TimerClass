@@ -234,6 +234,7 @@ contains
         integer :: overflow, ios
         integer(kind=4) :: days
 
+		total = TTime()
         total%daysecs=this%daysecs+that%daysecs
         overflow=0
         if (total%daysecs>60.0) then
@@ -263,6 +264,7 @@ contains
         integer :: ios
         !Using julian day numbers and day seconds, this gets a bit more simple
 
+		total = TTime()
         total%daysecs=this%daysecs-that%daysecs
         overflow=0
         do while (total%daysecs<0.0)
