@@ -248,3 +248,6 @@ doxygen/html/tab_h.png
 doxygen/html/tab_s.png
 doxygen/html/tabs.css
 doxygen/html/TimeClass_8f03.html
+*.html
+*.js
+*.tex
