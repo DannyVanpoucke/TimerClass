@@ -1,7 +1,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !MIT License
 !
-!Copyright (c) 2019 Danny Vanpoucke, https://dannyvanpoucke.be
+!Copyright (c) Dr. Dr. Danny E.P. Vanpoucke, https://dannyvanpoucke.be
 !
 !Permission is hereby granted, free of charge, to any person obtaining a copy
 !of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,13 @@
 
 
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!> \brief Timer class for practical timing.
+!>
+!! \brief Module containing the \link ttimer TTimer class\endlink for practical timing.
 !!
-!! \version 2.0 of the timing module.
+!! @author  Dr. Dr. Danny E. P. Vanpoucke
+!! @version 2.0-3  (upgrades deprecated timing module)
+!! @date    19-03-2020
+!! @copyright https://dannyvanpoucke.be
 !!
 !! This module makes use of:
 !! - \link timeclass TimeClass \endlink
@@ -36,51 +40,65 @@
 module Timerclass
     use TimeClass
     implicit none
+    private
 
-
+    !++++++++++++++++++++++++++++++++++++++++++
+    !> \class ttimer
+    !! \brief A class for keeping track of time
+    !! in calculations, by creating a list of timestamps.
+    !<----------------------------------------
     type, public :: TTimer
         private
-        integer :: ntimes   !< The number of timestamps stored
-        integer :: maxtimes !< The size of the timestamp list
-        Type(TTime), allocatable :: timestamps(:)
-        logical, allocatable :: timedInterval(:) !< logical indicating if the timer was running
+        !! Some EXTRA INFO on \ref ttimer
+        integer :: ntimes   !< @private The number of timestamps stored
+        integer :: maxtimes !< @private The size of the timestamp list
+        Type(TTime), allocatable :: timestamps(:)!< @private Allocatable list of timestamps
+        logical, allocatable :: timedInterval(:) !< @private logical indicating if the timer was running
                                                  !< during an interval between two timestamps or not
-        logical :: running  !< True if the timer is running
-        logical :: paused   !< True if the timer is paused
-        logical :: stopped  !< True if the timer is stopped (final end)
+        logical :: running  !< @private True if the timer is running
+        logical :: paused   !< @private True if the timer is paused
+        logical :: stopped  !< @private True if the timer is stopped (final end)
     contains
         private
-        procedure, pass(this), public :: Start     !< Clean start of the timer (includes a reset)
-        procedure, pass(this), public :: Interrupt !< Temporarily interrupt the timer
-        procedure, pass(this), public :: Resume    !< Resume timer after a pause.
-        procedure, pass(this), public :: AddTimeFlag !< Add a timestamp and don't change the setting (running/paused) of the timer.
-        procedure, pass(this), public :: StopTimer !< Stop the timer (terminal fashion...no restart possible)
-        procedure, pass(this), public :: Reset     !< Reset the timer
-        procedure, pass(this), public :: PrintElapsedTimeReport!< Print several lines with timing information
-        procedure, pass(this), public :: GetElapsedTimeString !< return a string with the elapsed time
-        procedure, pass(this)         :: GetElapsedTime_total !< Return the elapsed time in seconds between begin and end.
-        procedure, pass(this)         :: GetElapsedTime_steps !< Return the elapsed time in seconds between two timestamps.
-        procedure, pass(this)         :: Copy      !< Make a copy of a timer object
-        procedure, pass(this), private:: AddTimestamp !< adds a timestamp, for internal purposes only
-        generic, public :: assignment(=) => Copy      !< This is how copy is used.
-        generic, public :: GetElapsedTime => GetElapsedTime_total, GetElapsedTime_steps
-        final :: destructor
+        procedure, pass(this), public :: Start       !< @public @copydoc timerclass::start
+        procedure, pass(this), public :: Interrupt   !< @public @copydoc timerclass::interrupt
+        procedure, pass(this), public :: Resume      !< @public @copydoc timerclass::resume
+        procedure, pass(this), public :: AddTimeFlag !< @public @copydoc timerclass::addtimeflag
+        procedure, pass(this), public :: StopTimer   !< @public @copydoc timerclass::stoptimer
+        procedure, pass(this), public :: Reset       !< @public @copydoc timerclass::reset
+        procedure, pass(this), public :: PrintElapsedTimeReport!< @public @copydoc timerclass::printelapsedtimereport
+        procedure, pass(this), public :: GetElapsedTimeString  !< @public @copydoc timerclass::getelapsedtimestring
+        procedure, pass(this)         :: GetElapsedTime_total  !< @private @copydoc timerclass::getelapsedtime_total
+        procedure, pass(this)         :: GetElapsedTime_steps  !< @private @copydoc timerclass::getelapsedtime_steps
+        procedure, pass(this)         :: Copy         !< @private @copydoc timerclass::copy
+        procedure, pass(this),        :: AddTimestamp !< @private @copydoc timerclass::addtimestamp
+        generic, public :: assignment(=) => Copy      !< @public  @copydoc timerclass::copy
+        generic, public :: GetElapsedTime => GetElapsedTime_total, GetElapsedTime_steps !< @public Generic interface to the
+                                                        !< \link timerclass::getelapsedtime_total GetElapsedTime_total\endlink
+                                                        !< and \link timerclass::getelapsedtime_steps GetElapsedTime_steps\endlink methods of
+                                                        !< the \link ttimer TTimer\endlink class.
+        !> @{ @protected
+        final :: destructor !< @copydoc timerclass::destructor
+        !> @}
     end type TTimer
 
-    ! This is the only way a constructor can be created, as no "initial" exists
+
+    ! This is the only way a constructor can be created, as no "initial" exists, emulates the C++ constructor behaviour
     interface TTimer
         module procedure Constructor
     end interface TTimer
 
 contains
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Constructor for the TTimer instances.
+    !>\brief Constructor for the \link ttimer TTimer\endlink instances.
     !!
-    !! Usage:
+    !! \b Usage:
+    !! \code{.f03}
     !! Type(TTimer) :: T
     !! T=TTimer()
+    !! \endcode
     !!
-    !! \return Returns a TTimer object
+    !! \return Returns a \link ttimer TTimer\endlink object
     !<-------------------------------------------
     pure function Constructor()Result(Timer)
         Type(TTimer) :: Timer
@@ -96,10 +114,10 @@ contains
 
     end function Constructor
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Start the timer (clean start, everything is reset).
+    !>\brief Start the \link ttimer TTimer\endlink instance (clean start, everything is reset).
     !! If the timer was already running it is reset first.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !! \return TS The index of the first timestamp.
     !<-------------------------------------------
     function Start(this) Result(TS)
@@ -114,10 +132,10 @@ contains
 
     end function Start
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Restart the timer after a pause. If the timer is not paused,
+    !>\brief Restart the \link ttimer TTimer\endlink instance after a pause. If the timer is not paused,
     !! nothing will happen and TS=-1 is returned.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !! \return TS The index of the first timestamp.
     !<-------------------------------------------
     function Resume(this) Result(TS)
@@ -135,9 +153,10 @@ contains
 
     end function Resume
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Allows for the introduction of an additional time-stamp
-    !! without changing the timer-status (running/paused). If the Timer is stopped
-    !! nothing will happen, and -1 is returned.
+    !>\brief Add an additional timestamp without changing the
+    !! status (running/paused) of the \link ttimer TTimer\endlink instance.
+    !!
+    !! If the timer is stopped nothing will happen, and -1 is returned.
     !!
     !! @param[in,out] this The TTimer instance.
     !! \return TS The index of the timestamp.
@@ -155,7 +174,8 @@ contains
 
     end function AddTimeFlag
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Puts the timer on hold.
+    !>\brief Puts the \link ttimer TTimer\endlink instance on hold.
+    !!
     !! If the timer was not running nothing will happen.
     !! The optional IO parameter will return an error code.\n
     !! <b>IO values:</b>
@@ -165,7 +185,7 @@ contains
     !!
     !! In case of error, TS will be set to -1.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !! @param[out] IO Optional parameter giving the error-status. [\b OPTIONAL ; \b DEFAULT= 0]
     !! \return TS The index of the final timestamp.
     !<-------------------------------------------
@@ -190,7 +210,8 @@ contains
 
     end function Interrupt
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Stops the timer.
+    !>\brief Stops the \link ttimer TTimer\endlink instance (terminal fashion...no restart possible).
+    !!
     !! If the timer was not running nothing will happen.
     !! The optional IO parameter will return an error code.\n
     !! <b>IO values:</b>
@@ -200,7 +221,7 @@ contains
     !!
     !! In case of error, TS will be set to -1.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !! @param[out] IO Optional parameter giving the error-status. [\b OPTIONAL ; \b DEFAULT= 0]
     !! \return TS The index of the final timestamp.
     !<-------------------------------------------
@@ -225,10 +246,10 @@ contains
 
     end function StopTimer
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Start the timer.
+    !>\brief Start the \link ttimer TTimer\endlink instance.
     !! If the timer was already running it is reset first.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !<-------------------------------------------
     pure subroutine Reset(this)
         class(TTimer), intent(inout) :: this
@@ -246,11 +267,12 @@ contains
 
     end subroutine Reset
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Add a timestamp to a running timer, returning the index of the timestamp.
+    !>\brief Add a timestamp to a running \link ttimer TTimer\endlink instance,
+    !! returning the index of the timestamp.
     !!
     !! In case the timer is not running, nothing is done and -1 is returned.
     !!
-    !! @param[in,out] this The TTimer instance.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance.
     !! \return TS The index of the timestamp.
     !<-------------------------------------------
     function AddTimestamp(this)Result(TS)
@@ -289,8 +311,9 @@ contains
     !++++++++++++++++++++++++++++++++++++++++++++
     !>\brief Returns the number of seconds which elapsed between the start and stop timestamps.
     !!
-    !! @param[in] this The TTimer instance.
-    !! @param[in] INCL_PAUSE Logical indicating if the time during which the timer was paused should be included as well. [\b OPTIONAL, \b DEFAULT = .false. ]
+    !! @param[in] this The \link ttimer TTimer\endlink instance.
+    !! @param[in] INCL_PAUSE Logical indicating if the time during which the timer
+    !!             was paused should be included as well. [\b OPTIONAL, \b DEFAULT = .false. ]
     !! \return Seconds The (fractional) number of seconds elapsed, as double precision real.
     !<-------------------------------------------
     pure function GetElapsedTime_total(this,INCL_PAUSE) Result(sec)
@@ -316,7 +339,7 @@ contains
     !! - If the timestamps are out of range, then -1 is returned.
     !! - If the start comes after end, then they are exchanged such that a positive time is obtained.
     !!
-    !! @param[in] this The TTimer instance.
+    !! @param[in] this The \link ttimer TTimer\endlink instance.
     !! @param[in] Tstart, Tend The indices of the start and end time.
     !! @param[in] INCL_PAUSE Logical indicating if the time during which the timer was paused should be included as well. [\b OPTIONAL, \b DEFAULT = .false. ]
     !! \return Seconds The (fractional) number of seconds elapsed, as double precision real.
@@ -363,7 +386,7 @@ contains
     !++++++++++++++++++++++++++++++++++++++++++++++
     !>\brief Returns a string representing the elapsed time.
     !!+
-    !! @param[in] this The TTimer instance.
+    !! @param[in] this The \link ttimer TTimer\endlink instance.
     !! @param[in] TSTART, TSTOP Indices of the start and end-times. [\b OPTIONAL, \b DEFAULT: TSTART=1, TSTOP=index of last timestamp]
     !! @param[in] INCL_PAUSE Logical indicating if the time during which the timer was paused should be included as well. [\b OPTIONAL, \b DEFAULT = .false. ]
     !! @param[in] FMT string indicating the format for the time-string.
@@ -437,7 +460,7 @@ contains
     !>\brief Print small timings report to unit UN.
     !!
     !!
-    !! @param[in] this The TTimer instance.
+    !! @param[in] this The \link ttimer TTimer\endlink instance.
     !! @param[in] message String containing a message to include.
     !! @param[in] Tstart,Tstop Integer indexes of the start and stop times
     !! @param[in] UN Integer indicating the unit to write the report to.
@@ -472,10 +495,10 @@ contains
 
     end subroutine PrintElapsedTimeReport
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function to copy one TTimer instance to the current one via the "=" assignment.
+    !>\brief Function to copy one \link ttimer TTimer\endlink instance to the current one via the "=" assignment.
     !!
-    !! @param[in,out] this The TTimer instance before the "=" assignment.
-    !! @param[in] from The TTimer instance after the "=" assignment.
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance before the "=" assignment.
+    !! @param[in] from The \link ttimer TTimer\endlink instance after the "=" assignment.
     !<---------------------------------------------
     pure subroutine Copy(this,from)
         class(TTimer), intent(inout) :: this
@@ -497,8 +520,10 @@ contains
 
     end subroutine Copy
     !++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Destructor of the TTimer class. Cleans up
+    !>\brief Destructor of the \link ttimer TTimer\endlink class. Cleans up
     !! the instance upon finalization.
+    !!
+    !! @param[in,out] this The \link ttimer TTimer\endlink instance being destroyed automatically.
     !<-------------------------------------------
     subroutine destructor(this)
         Type(TTimer) :: this

@@ -1,7 +1,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !MIT License
 !
-!Copyright (c) 2019 Danny Vanpoucke, https://dannyvanpoucke.be
+!Copyright (c) Dr. Dr. Danny E.P. Vanpoucke, https://dannyvanpoucke.be
 !
 !Permission is hereby granted, free of charge, to any person obtaining a copy
 !of this software and associated documentation files (the "Software"), to deal
@@ -22,60 +22,75 @@
 !SOFTWARE.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!> \brief Time class used by the \ref timerclass for practical timing.
+!> \brief The <b>TimeClass module</b> contains the \link ttime TTime class\endlink used by the
+!! \link timerclass::ttimer TTimer class\endlink for practical timing.
 !!
-!! Internally we use Julian Day Numbers to compare dates. As a result we do not accept "negative" dates.
-!! If such dates are created (e.g. due to a subtraction), then the date is set to zero.
+!! @author  Dr. Dr. Danny E. P. Vanpoucke
+!! @version 2.0-3  (upgrades deprecated timing module)
+!! @date    19-03-2020
+!! @copyright https://dannyvanpoucke.be
+!!
+!! @warning Internally, Julian Day Numbers are used to compare dates. As a result, *negative* dates are not accepted.
+!! If such dates are created (*e.g.*, due to a subtraction), then the date is set to zero.
 !!
 !! This module makes use of:
-!! - nothing; this module should be fully independent
+!! - nothing; this module is fully independent
 !<-----------------------------------------------------------------------
 module TimeClass
     implicit none
     private
 
+
+    !+++++++++++++++++++++++++++++++++++++++
+    !> @class ttime
+    !! \brief The TTime class contains all time functionality
+    !! with regard to a single time stamp.
+    !<-------------------------------------
     type, public :: TTime
       private
-        integer :: year    !< The year.
-        integer :: month   !< The month (as integer).
-        integer :: day     !< Day of the month.
-        integer(kind=4) :: JDN !< The Julian Day Number, as a long-int (4-byte)
-        real    :: daysecs !< Number of seconds of the day, with millisecond resolution.
+        integer :: year    !< @private The year
+        integer :: month   !< @private The month (as integer).
+        integer :: day     !< @private Day of the month.
+        integer(kind=4) :: JDN !< @private The Julian Day Number, as a long-int (4-byte)
+        real    :: daysecs !< @private Number of seconds of the day, with millisecond resolution.
     contains
       private
-        procedure, pass(this),public :: SetTime       !< Set the time to the current time
-        procedure, pass(this)        :: CalculateJDN  !< Private function calculating the Julian Day number based on the Gregorian date set in the TTime object
-        procedure, pass(this)        :: SetJDN        !< private function to set the Julian Day Number
-        procedure, pass(this)        :: SetGregorianDateFromJDN !< Private function transforming a Julian Day number into a Gregorian calender date
-        procedure, pass(this),public :: GetJulianDayNumber      !< returns the Julian day
-        procedure, pass(this)        :: copy          !< Copy content from other TTime instance, private, accessed via the assignment statement
-        procedure, pass(this)        :: add           !< Add two TTime instances.
-        procedure, pass(this)        :: subtract      !< Add two TTime instances.
-        procedure, pass(this),public :: IsLeapYear    !< Returns true if the year component is a leap year.
-        procedure, pass(this),public :: GetTimeString !< returns a formatted time-string
-        procedure, pass(this),public :: GetTimeSeconds!< returns the time as a fractional number of seconds, double precision
-        generic, public :: assignment(=) => copy      !< This is how copy is used.
-        generic, public :: operator(+)   => add       !< This is how add is used.
-        generic, public :: operator(-)   => subtract  !< This is how subtract is used.
-
-        final :: destructor
+        procedure, pass(this),public :: SetTime       !<          @copydoc timeclass::settime
+        procedure, pass(this)        :: CalculateJDN  !< @private @copydoc timeclass::calculatejdn
+        procedure, pass(this)        :: SetJDN        !< @private @copydoc timeclass::setjdn
+        procedure, pass(this)        :: SetGregorianDateFromJDN !< @private @copydoc timeclass::setgregoriandatefromjdn
+        procedure, pass(this),public :: GetJulianDayNumber      !< @copydoc timeclass::getjuliandaynumber
+        procedure, pass(this)        :: copy          !< @private @copydoc timeclass::copy
+        procedure, pass(this)        :: add           !< @private @copydoc timeclass::add
+        procedure, pass(this)        :: subtract      !< @private @copydoc timeclass::subtract
+        procedure, pass(this),public :: IsLeapYear    !<          @copydoc timeclass::isleapyear
+        procedure, pass(this),public :: GetTimeString !<          @copydoc timeclass::gettimestring
+        procedure, pass(this),public :: GetTimeSeconds!<          @copydoc timeclass::gettimeseconds
+        generic, public :: assignment(=) => copy      !<          @copydoc timeclass::copy
+        generic, public :: operator(+)   => add       !<          @copydoc timeclass::add
+        generic, public :: operator(-)   => subtract  !<          @copydoc timeclass::subtract
+        !> @{ @protected
+        final :: destructor !< @copydoc timeclass::destructor
+        !> @}
     end type TTime
 
+    ! This is the only way a constructor can be created, as no "initial" exists, emulates the C++ constructor behaviour
     interface TTime
         module procedure constructor
     end interface TTime
 
 contains
     !+++++++++++++++++++++++++++++++++++++++++
-    !>\brief Constructor for the TTime class.
+    !>\brief Constructor for the \link ttime TTime\endlink class.
     !!
-    !! Note that this constructor does not set the time. It just enters zero's
+    !! \note This constructor does not set the time. It just enters zero's.
     !!
     !! \b usage:
+    !! \code{.f03}
     !! Type(TTime) :: T
     !! T = TTime()
+    !! \endcode
     !!
     !! \return Time An instance of the TTime class.
     !<-----------------------------------------
@@ -89,12 +104,13 @@ contains
         Time%daysecs=0
     end function constructor
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function to set the TTime instance to the current time,
+    !>\brief Function to set the \link ttime TTime\endlink instance to the current time,
     !! with millisecond resolution.
     !!
-    !! As this subroutine uses the date_and_time intrinsic it is an impure subroutine.
+    !! \ingroup ttime
+    !! \note As this subroutine uses the date_and_time intrinsic it is an *impure* subroutine.
     !!
-    !! @param[in,out] this The TTime instance being called.
+    !! @param[in,out] this The \link ttime TTime\endlink instance being called.
     !<---------------------------------------------
     subroutine SetTime(this)
         class(TTime), intent(inout) :: this
@@ -111,10 +127,13 @@ contains
 
     end subroutine SetTime
     !+++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Transforms the set Gregorian calender date
-    !! into a Julian Day Number.
+    !>\brief Calculating the Julian Day number based
+    !! on the Gregorian date set in the \link ttime TTime\endlink object.
     !!
-    !! @param[in,out] this The TTime instance being called.
+    !! In practice the Gregorian calender date set in the \link ttime TTime\endlink
+    !! instance is transformed into a Julian Day Number, and stored in the instance as \ref ttime::jdn.
+    !!
+    !! @param[in,out] this The \link ttime TTime\endlink instance being called.
     !<----------------------------------------------
     pure subroutine CalculateJDN(this)
         class(TTime), intent(inout) :: this
@@ -126,12 +145,12 @@ contains
 
     end subroutine CalculateJDN
     !+++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Set the Julian Day Number.
+    !>\brief Set the Julian Day Number of a \link ttime TTime\endlink instance manually.
     !!
-    !! \b NOTE: The Julian Day Number should be >=0.
+    !! \note The Julian Day Number should be >=0.
     !! For negative values it is set to 0, and an error value is set to IO
     !!
-    !! @param[in,out] this The TTime instance being called.
+    !! @param[in,out] this The \link ttime TTime\endlink instance being called.
     !! @param[in] JDN A positive integer(kind=4) value representing a valid Julian Day Number.
     !! @param[out] IO Integer value returning 0 upon success, and a negative value(=JDN) in case of failure.
     !<----------------------------------------------
@@ -158,7 +177,7 @@ contains
     !!
     !! Use integer(kind=4).
     !!
-    !! @param[in,out] this The TTime instance being called.
+    !! @param[in,out] this The \link ttime TTime\endlink instance being called.
     !! \return JDN The integer Julian Day Number.
     !<----------------------------------------------
     pure function GetJulianDayNumber(this) Result(JDN)
@@ -169,13 +188,12 @@ contains
 
     end function GetJulianDayNumber
     !+++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Subroutine which transforms the set Julian Date Number into a Gregorian Calender date.
+    !>\brief Subroutine which transforms the set Julian Day Number into a Gregorian Calender date.
     !!
-    !! \b NOTE:
-    !! The routine is only valid for a JDN>=0.
+    !! \note The routine is only valid for a JDN>=0.
     !!
-    !! @param[in,out] this The TTime instance being called.
-    !! @param[out] IO Returns 0 on success, and -1 for failure. [\b OPTIONAL]
+    !! @param[in,out] this The \link ttime TTime\endlink instance being called.
+    !! @param[out] IO Returns 0 on success, and -1 for failure. [\b OPTIONAL ]
     !<----------------------------------------------
     pure subroutine SetGregorianDateFromJDN(this, IO)
         class(TTime), intent(inout) :: this
@@ -199,10 +217,17 @@ contains
 
     end subroutine SetGregorianDateFromJDN
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function to copy one TTime instance to the current one via the "=" assignment.
+    !>\brief Function to copy one \link ttime TTime\endlink instance
+    !! to the current one via the "=" assignment. This is the function
+    !! performing the actual operator overloading.
     !!
-    !! @param[in,out] this The TTime instance before the "=" assignment.
-    !! @param[in] from The TTime instance after the "=" assignment.
+    !! \b usage:
+    !! \code{.f03}
+    !! Tnew = Told
+    !! \endcode
+    !!
+    !! @param[in,out] this The \link ttime TTime\endlink instance before the "=" assignment.
+    !! @param[in] from The \link ttime TTime\endlink instance after the "=" assignment.
     !<---------------------------------------------
     pure subroutine copy(this,from)
         class(TTime), intent(inout) :: this
@@ -216,16 +241,24 @@ contains
 
     end subroutine copy
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function to add two TTime instance via the "+" operator.
+    !>\brief Function to add two \link ttime TTime\endlink instance
+    !! via the "+" operator. This is the function
+    !! performing the actual operator overloading.
     !!
     !! Adding two full dates is maybe a bit strange to do. In our case, we don't
-    !! just add the days and add the months, but we add the days of the year
+    !! just add the days and add the months, but we add the days of the year (via their Julian Day Numbers)
     !! and transform these back to months and days. (why keep life simple if we can
-    !! make it complicated?
+    !! make it complicated?)
     !!
-    !! @param[in] this The TTime instance before the "+" operator.
-    !! @param[in] that The TTime instance after the "+" operator.
-    !! \return Total The TTime instance representing the sum.
+    !! \b usage:
+    !! \code{.f03}
+    !! Total = this + that
+    !! \endcode
+    !! This line also calls the \link copy assignment operator\endlink.
+    !!
+    !! @param[in] this The \link ttime TTime\endlink instance before the "+" operator.
+    !! @param[in] that The \link ttime TTime\endlink instance after the "+" operator.
+    !! \return Total The \link ttime TTime\endlink instance representing the sum.
     !<---------------------------------------------
     pure function add(this,that) Result(Total)
         class(TTime), intent(in) :: this, that
@@ -247,14 +280,21 @@ contains
 
     end function add
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function to subtract two TTime instance via the "-" operator.
+    !>\brief Function to subtract two \link ttime TTime\endlink instance
+    !! via the "-" operator. This is the function
+    !! performing the actual operator overloading.
     !!
-    !! \b NOTE:
-    !! The result should remain a positive number.
+    !! \b usage:
+    !! \code{.f03}
+    !! Total = this - that
+    !! \endcode
+    !! This line also calls the \link copy assignment operator\endlink.
     !!
-    !! @param[in] this The TTime instance before the "-" operator.
-    !! @param[in] that The TTime instance after the "-" operator.
-    !! \return Total The TTime instance representing the difference.
+    !! \note The result should remain a positive number.
+    !!
+    !! @param[in] this The \link ttime TTime\endlink instance before the "-" operator.
+    !! @param[in] that The \link ttime TTime\endlink instance after the "-" operator.
+    !! \return Total The \link ttime TTime\endlink instance representing the difference.
     !<---------------------------------------------
     pure function subtract(this,that) Result(Total)
         class(TTime), intent(in) :: this, that
@@ -276,11 +316,11 @@ contains
 
     end function subtract
     !++++++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Function returning true/false if the year of the TTime instance is a leap year.
+    !>\brief Function returning true/false if the year of the \link ttime TTime\endlink instance is a leap year.
     !!
     !! A leap year is a multiple of 4, but not 100, unless 400
     !!
-    !! @param[in] this The TTime instance to check the leap-year.
+    !! @param[in] this The \link ttime TTime\endlink instance to check the leap-year.
     !! \return Leap Boolean indicating if the year is a leap-year.
     !<---------------------------------------------
     pure function IsLeapYear(this) Result(Leap)
@@ -308,7 +348,7 @@ contains
     !! - hours: Same as days, but transformed to hours.
     !! - seconds: Same as days, but transformed to seconds.
     !!
-    !! @param[in] this The TTime instance transform into a string.
+    !! @param[in] this The \link ttime TTime\endlink instance transform into a string.
     !! @param[in] fmt String representing the possible formatting. [\b OPTIONAL, \b DEFAULT = full]
     !! \return TS String with formatted time.
     !<---------------------------------------------
@@ -355,7 +395,7 @@ contains
     !++++++++++++++++++++++++++++++++++++++++++++
     !>\brief Function returning the time in (fractional) seconds (double precision).
     !!
-    !! @param[in] this The TTime instance.
+    !! @param[in] this The \link ttime TTime\endlink instance.
     !! \return sec total number of seconds representing the "time" as a double precision value.
     !<-------------------------------------------
     pure function GetTimeSeconds(this) Result(sec)
@@ -368,11 +408,12 @@ contains
 
     end function GetTimeSeconds
     !+++++++++++++++++++++++++++++++++++++++++++
-    !>\brief Destructor of the TTime object instance.
+    !>\brief Destructor of the \link ttime TTime\endlink object instance.
+    !!
     !! This subroutine is automatically called upon
     !! finalization of the instance.
     !!
-    !! @param[in,out] this The instance of the TTime class in need of destruction.
+    !! @param[in,out] this The instance of the \link ttime TTime\endlink class in need of destruction.
     !<------------------------------------------
     subroutine destructor(this)
         type(TTime) :: this
