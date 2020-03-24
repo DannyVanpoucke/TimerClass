@@ -1,0 +1,5 @@
+<map id="timeclass::destructor" name="timeclass::destructor">
+<area shape="rect" id="node1" title="Destructor of the TTime object instance." alt="" coords="235,35,379,61"/>
+<area shape="rect" id="node2" href="$structtimeclass_1_1ttime.html#a91fef160b4d8636cc9f909a243e89217" title="Destructor of the TTime object instance." alt="" coords="5,5,187,32"/>
+<area shape="rect" id="node3" href="$structtimerclass_1_1ttimer.html#ae87a36bbd99861e205daca5d0d8b2d01" title="Destructor of the TTimer class. Cleans up the instance upon finalization." alt="" coords="35,57,157,98"/>
+</map>
