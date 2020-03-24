@@ -1,4 +1,0 @@
-<map id="timerclass::getelapsedtime_steps" name="timerclass::getelapsedtime_steps">
-<area shape="rect" id="node1" title="Returns the number of seconds which elapsed between two timestamps. This is always a positive value." alt="" coords="176,5,355,47"/>
-<area shape="rect" id="node2" href="$structtimerclass_1_1ttimer.html#aeab48840143688d01e60857620b1f560" title="Generic interface to the GetElapsedTime_total and GetElapsedTime_steps methods of the TTimer class." alt="" coords="5,5,128,47"/>
-</map>
