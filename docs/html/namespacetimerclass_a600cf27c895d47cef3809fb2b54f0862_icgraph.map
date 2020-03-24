@@ -1,0 +1,4 @@
+<map id="timerclass::getelapsedtime_total" name="timerclass::getelapsedtime_total">
+<area shape="rect" id="node1" title="Returns the number of seconds which elapsed between the start and stop timestamps." alt="" coords="176,5,355,47"/>
+<area shape="rect" id="node2" href="$structtimerclass_1_1ttimer.html#aeab48840143688d01e60857620b1f560" title="Generic interface to the GetElapsedTime_total and GetElapsedTime_steps methods of the TTimer class." alt="" coords="5,5,128,47"/>
+</map>

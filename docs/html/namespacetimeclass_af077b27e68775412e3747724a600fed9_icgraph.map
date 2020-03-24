@@ -1,0 +1,5 @@
+<map id="timeclass::copy" name="timeclass::copy">
+<area shape="rect" id="node1" title="Function to copy one TTime instance to the current one via the &quot;=&quot; assignment. This is the function p..." alt="" coords="244,35,359,61"/>
+<area shape="rect" id="node2" href="$structtimeclass_1_1ttime.html#ad9d449f3a7640dd75efbb954a60287a8" title="Function to copy one TTime instance to the current one via the &quot;=&quot; assignment. This is the function p..." alt="" coords="5,5,196,32"/>
+<area shape="rect" id="node3" href="$structtimerclass_1_1ttimer.html#a9328f11d03596130e3a04dc120969fb1" title="Function to copy one TTimer instance to the current one via the &quot;=&quot; assignment." alt="" coords="39,57,162,98"/>
+</map>

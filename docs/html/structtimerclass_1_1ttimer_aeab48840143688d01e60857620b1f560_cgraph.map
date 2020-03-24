@@ -1,0 +1,5 @@
+<map id="timerclass::ttimer::getelapsedtime" name="timerclass::ttimer::getelapsedtime">
+<area shape="rect" id="node1" title="Generic interface to the GetElapsedTime_total and GetElapsedTime_steps methods of the TTimer class." alt="" coords="5,39,128,80"/>
+<area shape="rect" id="node2" href="$namespacetimerclass.html#a3224b1e768693078e40efc35d66a4b3c" title="Returns the number of seconds which elapsed between two timestamps. This is always a positive value." alt="" coords="176,5,355,47"/>
+<area shape="rect" id="node3" href="$namespacetimerclass.html#a600cf27c895d47cef3809fb2b54f0862" title="Returns the number of seconds which elapsed between the start and stop timestamps." alt="" coords="176,71,355,112"/>
+</map>
