@@ -6,8 +6,8 @@ in Fortran 2003. It is part of a series of modern Fortran tutorials published on
 [webpage](https://dannyvanpoucke.be) :
 1. Tutorial OOP(III): [Constructors and Destructors](https://dannyvanpoucke.be/oop-fortran-tut4-en/)
 2. Tutorial OOP(IV) : [Operator and Assignment Overloading](https://dannyvanpoucke.be/oop-fortran-tut5-en/)
-3. Tutorial OOP(V)  : Privacy in Classes
-4. Tutorial OOP(VI) : Doxygen Documentation of Classes
+3. Tutorial OOP(VI) : [Doxygen Documentation of Classes](https://dannyvanpoucke.be/oop-fortran-tut6-en/)
+4. Tutorial OOP(V)  : Privacy in Classes
 
 This TimerClass is, however, not solely developed for the purpose of these tutorials. It
 also is intended as an upgrade of my former timer and timing functions of my HIVE-toolbox.
