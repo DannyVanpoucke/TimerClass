@@ -26,8 +26,7 @@
 
 
 !++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-!>
-!! \brief Module containing the \link ttimer TTimer class\endlink for practical timing.
+!> \brief Module containing the \link ttimer TTimer class\endlink for practical timing.
 !!
 !! @author  Dr. Dr. Danny E. P. Vanpoucke
 !! @version 2.0-3  (upgrades deprecated timing module)
@@ -71,7 +70,7 @@ module Timerclass
         procedure, pass(this)         :: GetElapsedTime_total  !< @private @copydoc timerclass::getelapsedtime_total
         procedure, pass(this)         :: GetElapsedTime_steps  !< @private @copydoc timerclass::getelapsedtime_steps
         procedure, pass(this)         :: Copy         !< @private @copydoc timerclass::copy
-        procedure, pass(this),        :: AddTimestamp !< @private @copydoc timerclass::addtimestamp
+        procedure, pass(this)         :: AddTimestamp !< @private @copydoc timerclass::addtimestamp
         generic, public :: assignment(=) => Copy      !< @public  @copydoc timerclass::copy
         generic, public :: GetElapsedTime => GetElapsedTime_total, GetElapsedTime_steps !< @public Generic interface to the
                                                         !< \link timerclass::getelapsedtime_total GetElapsedTime_total\endlink
